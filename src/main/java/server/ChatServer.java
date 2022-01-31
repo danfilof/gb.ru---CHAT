@@ -57,6 +57,7 @@ public class ChatServer {
         final String TO = message.split(" ")[1];
         for (ClientHandler client : clients.values()) {
             if (client.getNick().equals(TO)) {
+                // Выводим приватное сообщение и стираем у него первые 7 символов, дабы избежать повторения
                 client.sendMessage("/w from " + FROM.getNick() + ": " + message.substring(7));
                 break;
             }
