@@ -25,24 +25,24 @@ public class ChatClient {
             out = new DataOutputStream(socket.getOutputStream());
             new Thread(() -> {
                 try {
-                while (true) {
-                    final String authMsg = in.readUTF();
-                    if (authMsg.startsWith("/authok")) {
-                        final String nick = authMsg.split(" ")[1];
-                        controller.addMessage("Successful authorisation. Nick: " + nick);
-                        break;
+                    while (true) {
+                        final String authMsg = in.readUTF();
+                        if (authMsg.startsWith("/authok")) {
+                            final String nick = authMsg.split(" ")[1];
+                            controller.addMessage("Successful authorisation. Nick: " + nick);
+                            break;
+                        }
                     }
-                }
-                while (true) {
-                    final String message = in.readUTF();
-                    if ("/end".equals(message)) {
-                        break;
+                    while (true) {
+                        final String message = in.readUTF();
+                        if ("/end".equals(message)) {
+                            break;
+                        }
+                        controller.addMessage(message);
                     }
-                    controller.addMessage(message);
-                }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
                     closeConnection();
                 }
             }).start();

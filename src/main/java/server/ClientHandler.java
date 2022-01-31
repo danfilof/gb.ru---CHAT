@@ -1,7 +1,5 @@
 package server;
 
-import javafx.application.Platform;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,9 +18,9 @@ public class ClientHandler {
 
     public ClientHandler(Socket socket, ChatServer chatServer) {
         try {
-        this.nick = "";
-        this.socket = socket;
-        this.chatServer = chatServer;
+            this.nick = "";
+            this.socket = socket;
+            this.chatServer = chatServer;
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
@@ -36,7 +34,7 @@ public class ClientHandler {
 
             }).start();
         } catch (IOException e) {
-           throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -67,13 +65,13 @@ public class ClientHandler {
 
     private void readMessage() {
         try {
-        while (true) {
-            final String message = in.readUTF();
-            if ("/end".equals(message)) {
-                break;
+            while (true) {
+                final String message = in.readUTF();
+                if ("/end".equals(message)) {
+                    break;
+                }
+                chatServer.broadcast(message);
             }
-            chatServer.broadcast(message);
-        }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,10 +82,10 @@ public class ClientHandler {
             try {
                 final String message = in.readUTF(); // auth login pass
                 if (message.startsWith("/auth")) {
+                    // MAKE CHECK METHOD TO CONFIRM BOTH LOGIN AND PASSWORD HAVE BEEN RECEIVED, OTHERWISE ARRAYINDEXOUTOFBOUNDARYEXCEPTION
                     final String[] split = message.split(" ");
                     final String login = split[1];
                     final String password = split[2];
-                    // Проверка на правильно введенные логин и пароль НУЖНА!
                     String nick = chatServer.getAuthService().getNickByLoginAndPassword(login, password);
                     if (nick != null) {
                         if (chatServer.isNickBusy(nick)) {
@@ -96,7 +94,7 @@ public class ClientHandler {
                         }
                         sendMessage("/authok " + nick);
                         this.nick = nick;
-                        chatServer.broadcast("The user " + nick + " has entered the chat");
+                        chatServer.broadcast("The user " + nick + " has entered thr chat");
                         chatServer.subscribe(this);
                         break;
                     } else {
@@ -114,7 +112,7 @@ public class ClientHandler {
             if (message.startsWith("/")) {
                 out.writeUTF(message);
             } else {
-                out.writeUTF(LocalTime.now().withSecond(0).withNano(0) + " || " + nick + ": " + message);
+                out.writeUTF (LocalTime.now().withSecond(0).withNano(0) + " || " + nick + ": " + message);
             }
         } catch (IOException e) {
             e.printStackTrace();

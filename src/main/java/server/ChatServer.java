@@ -22,7 +22,6 @@ public class ChatServer {
                 System.out.println("Waiting for connection...");
                 final Socket socket = serverSocket.accept();
                 new ClientHandler(socket, this);
-                // Дописал возможность видеть имя клиента, который подключился, в консоли
                 System.out.printf("The client %s has connected.", socket.getInetAddress().getHostName());
             }
         } catch (IOException e) {
