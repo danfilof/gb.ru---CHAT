@@ -22,7 +22,7 @@ public class ChatServer {
                 System.out.println("Waiting for connection...");
                 final Socket socket = serverSocket.accept();
                 new ClientHandler(socket, this);
-                System.out.println("The client has connected.");
+                System.out.printf("The client %s has connected.", socket.getInetAddress().getHostName());
             }
         } catch (IOException e) {
             e.printStackTrace();

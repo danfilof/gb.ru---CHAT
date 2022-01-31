@@ -25,6 +25,7 @@ public class ClientController {
     public void onClickSendButton (ActionEvent actionEvent) {
         final String message = messageField.getText();
         if (message != null && !message.isEmpty()) {
+            messageArea.appendText(message + "\n");
             client.sendMessage(message);
             messageField.clear();
             messageField.requestFocus();
