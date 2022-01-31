@@ -52,7 +52,7 @@ public class ChatServer {
             client.sendMessage(message);
         }
     }
-
+    // Отправка приватных сообщений пользователю
     public void privateSend(ClientHandler FROM, String message) {
         final String TO = message.split(" ")[1];
         for (ClientHandler client : clients.values()) {
@@ -61,6 +61,7 @@ public class ChatServer {
                 break;
             }
         }
+        // Написать пользователю, что он отправил приватное сообщение
         FROM.sendMessage("/w to " + TO + ": " + message.substring(7));
     }
 }
