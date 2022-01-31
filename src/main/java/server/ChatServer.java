@@ -52,4 +52,15 @@ public class ChatServer {
             client.sendMessage(message);
         }
     }
+
+    public void privateSend(ClientHandler FROM, String message) {
+        final String TO = message.split(" ")[1];
+        for (ClientHandler client : clients.values()) {
+            if (client.getNick().equals(TO)) {
+                client.sendMessage("/w from " + FROM.getNick() + ": " + message.substring(7));
+                break;
+            }
+        }
+        FROM.sendMessage("/w to " + TO + ": " + message.substring(7));
+    }
 }

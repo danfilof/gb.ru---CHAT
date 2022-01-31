@@ -69,8 +69,12 @@ public class ClientHandler {
                 final String message = in.readUTF();
                 if ("/end".equals(message)) {
                     break;
+                } else if (message.startsWith("/w")) {
+                    final String privateMSG = message;
+                    chatServer.privateSend(this, privateMSG);
+                } else {
+                    chatServer.broadcast(message);
                 }
-                chatServer.broadcast(message);
             }
         } catch (IOException e) {
             e.printStackTrace();
