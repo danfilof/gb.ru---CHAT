@@ -31,7 +31,6 @@ public class ClientController {
             messageField.requestFocus();
         }
     }
-
     public void addMessage(String message) {
         messageArea.appendText(message + "\n");
     }

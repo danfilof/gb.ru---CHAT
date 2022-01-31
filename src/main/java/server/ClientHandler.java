@@ -1,10 +1,13 @@
 package server;
 
+import javafx.application.Platform;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class ClientHandler {
     private final Socket socket;
@@ -81,10 +84,10 @@ public class ClientHandler {
             try {
                 final String message = in.readUTF(); // auth login pass
                 if (message.startsWith("/auth")) {
-                    // MAKE CHECK METHOD TO CONFIRM BOTH LOGIN AND PASSWORD HAVE BEEN RECEIVED, OTHERWISE ARRAYINDEXOUTOFBOUNDARYEXCEPTION
                     final String[] split = message.split(" ");
                     final String login = split[1];
                     final String password = split[2];
+                    // Проверка на правильно введенные логин и пароль НУЖНА!
                     String nick = chatServer.getAuthService().getNickByLoginAndPassword(login, password);
                     if (nick != null) {
                         if (chatServer.isNickBusy(nick)) {
@@ -93,7 +96,7 @@ public class ClientHandler {
                         }
                         sendMessage("/authok " + nick);
                         this.nick = nick;
-                        chatServer.broadcast("The user " + nick + "has entered thr chat");
+                        chatServer.broadcast("The user " + nick + " has entered the chat");
                         chatServer.subscribe(this);
                         break;
                     } else {
@@ -111,7 +114,7 @@ public class ClientHandler {
             if (message.startsWith("/")) {
                 out.writeUTF(message);
             } else {
-                out.writeUTF(nick + ": " + message);
+                out.writeUTF(LocalTime.now().withSecond(0).withNano(0) + " || " + nick + ": " + message);
             }
         } catch (IOException e) {
             e.printStackTrace();
