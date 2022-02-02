@@ -23,6 +23,7 @@ public class ChatServer {
                 final Socket socket = serverSocket.accept();
                 new ClientHandler(socket, this);
                 System.out.printf("The client %s has connected.", socket.getInetAddress().getHostName());
+                System.out.println("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

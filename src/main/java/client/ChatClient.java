@@ -30,12 +30,14 @@ public class ChatClient {
                         if (authMsg.startsWith("/authok")) {
                             final String nick = authMsg.split(" ")[1];
                             controller.addMessage("Successful authorisation. Nick: " + nick);
+                            controller.setAuth(true);
                             break;
                         }
                     }
                     while (true) {
                         final String message = in.readUTF();
                         if ("/end".equals(message)) {
+                            controller.setAuth(false);
                             break;
                         }
                         controller.addMessage(message);
