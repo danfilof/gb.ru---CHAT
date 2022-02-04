@@ -1,11 +1,16 @@
 package client;
 
 import server.ClientController;
+import server.Command;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
+
+import static server.Command.*;
 
 public class ChatClient {
     private Socket socket;
@@ -25,24 +30,33 @@ public class ChatClient {
             out = new DataOutputStream(socket.getOutputStream());
             new Thread(() -> {
                 try {
-                while (true) {
-                    final String authMsg = in.readUTF();
-                    if (authMsg.startsWith("/authok")) {
-                        final String nick = authMsg.split(" ")[1];
-                        controller.addMessage("Successful authorisation. Nick: " + nick);
-                        break;
+                    while (true) {
+                        final String authMsg = in.readUTF();
+                        if (getCommandByText(authMsg) == AUTHOK) {
+                            final String nick = authMsg.split(" ")[1];
+                            controller.addMessage("Successful authorisation. Nick: " + nick);
+                            controller.setAuth(true);
+                            break;
+                        }
                     }
-                }
-                while (true) {
-                    final String message = in.readUTF();
-                    if ("/end".equals(message)) {
-                        break;
+                    while (true) {
+                        final String message = in.readUTF();
+                        if (Command.isCommand(message)) {
+                            final Command command = getCommandByText(message);
+                            if (command == END) {
+                                controller.setAuth(false);
+                                break;
+                            }
+                            if (getCommandByText(message) == CLIENTS) {
+                                String[] clients = message.replace(CLIENTS.getCommand() + " ", "").split(" ");
+                                controller.updateClientsList(clients);
+                            }
+                        }
+                        controller.addMessage(message);
                     }
-                    controller.addMessage(message);
-                }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
                     closeConnection();
                 }
             }).start();
