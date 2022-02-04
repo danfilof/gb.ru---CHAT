@@ -92,11 +92,13 @@ public class ClientHandler {
     }
 
     private void authenticate() {
+
         while (true) {
+            // Вводим простую переменную для проверки идентификации
+            int clientIsAuth = 0;
             try {
                 final String message = in.readUTF(); // auth login pass
                 if (getCommandByText(message) == AUTH) {
-                    // MAKE CHECK METHOD TO CONFIRM BOTH LOGIN AND PASSWORD HAVE BEEN RECEIVED, OTHERWISE ARRAYINDEXOUTOFBOUNDARYEXCEPTION
                     final String[] split = message.split(" ");
                     final String login = split[1];
                     final String password = split[2];
@@ -108,8 +110,10 @@ public class ClientHandler {
                         }
                         sendMessage(Command.AUTHOK, nick);
                         this.nick = nick;
-                        chatServer.broadcast("The user " + nick + " has entered thr chat");
+                        chatServer.broadcast("The user " + nick + " has entered the chat");
                         chatServer.subscribe(this);
+                        // Клиент подключился и авторизовался. Значение переменной меняется
+                        clientIsAuth = 1;
                         break;
                     } else {
                         sendMessage("Wrong login and password");
@@ -118,9 +122,24 @@ public class ClientHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // Проверка на авторизованность
+            int finalClientIsAuth = clientIsAuth;
+            // Запускаю цикл для проверки авторизации. И отпраляю его спать на 2 минуты
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        wait(120000);
+                        // Если знамение переменной не изменилось, значит, авторизация не произошла. Следовательно спустя 120 секунд нужно закрыть сокет.
+                        if (finalClientIsAuth == 0) {
+                            socket.close();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
     }
-
     public void sendMessage(Command command ,String message) {
         try {
             out.writeUTF(command.getCommand() + " " + message);
