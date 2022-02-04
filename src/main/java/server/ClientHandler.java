@@ -122,6 +122,7 @@ public class ClientHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             // Проверка на авторизованность
             int finalClientIsAuth = clientIsAuth;
             // Запускаю цикл для проверки авторизации. И отпраляю его спать на 2 минуты
