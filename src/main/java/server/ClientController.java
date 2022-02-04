@@ -58,7 +58,7 @@ public class ClientController {
         if (mouseEvent.getClickCount() == 2) {
            final String message = messageField.getText();
             final String client = clientList.getSelectionModel().getSelectedItem();
-            messageField.setText("/w" + client + " " + message);
+            messageField.setText(Command.PRIVATE_MESSAGE.getCommand() + client + " " + message);
             messageField.requestFocus();
             messageField.selectEnd();
         }

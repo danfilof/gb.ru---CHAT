@@ -3,14 +3,17 @@ package server;
 import java.util.Arrays;
 
 public enum Command {
-
+    AUTHOK("/authok"),
     AUTH("/auth"),
-   AUTHOK("/authok"),
    PRIVATE_MESSAGE("/w"),
     END("/end"),
     CLIENTS("/clients");
 
     private String command;
+
+    public static boolean isCommand(String message) {
+        return message.startsWith(getCommandPrefix());
+    }
 
     public String getCommand() {
         return command;
@@ -23,7 +26,7 @@ public enum Command {
     public static Command getCommandByText(String text) {
         return Arrays.stream(values()).
                 filter(cmd -> text.startsWith(cmd.getCommand()))
-                        .findAny().orElseThrow(() -> new RuntimeException("Unknown command"));
+                        .findAny().orElseThrow(() -> new RuntimeException("Unknown command" + text));
     }
 
     public static String getCommandPrefix() {

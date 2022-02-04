@@ -43,10 +43,12 @@ public class ChatServer {
 
     public void subscribe (ClientHandler client) {
         clients.put(client.getNick(), client);
+        broadcastClientList();
     }
 
     public void unsubscribe (ClientHandler client) {
         clients.remove(client.getNick(), client);
+        broadcastClientList();
     }
 
     public void broadcast (String message) {
@@ -59,7 +61,7 @@ public class ChatServer {
         final ClientHandler clientTo = clients.get(nickTo);
         if (clientTo != null) {
             clientTo.sendMessage("From " + from.getNick() + ": " + message);
-            from.sendMessage("The user " + nickTo + ": " + message);
+            from.sendMessage("To " + nickTo + ": " + message);
             return;
         }
         from.sendMessage("There is no user in the chat with nick " + nickTo);
@@ -69,6 +71,12 @@ public void broadcastClientList() {
         final String message = clients.values().stream()
                 .map(ClientHandler::getNick)
                 .collect(Collectors.joining(" "));
-        broadcast(message);
+        broadcast(Command.CLIENTS, message);
 }
+
+    private void broadcast(Command command, String message) {
+        for (ClientHandler client : clients.values()) {
+            client.sendMessage(command, message);
+        }
+    }
 }

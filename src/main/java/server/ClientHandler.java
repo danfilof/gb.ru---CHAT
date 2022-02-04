@@ -73,16 +73,18 @@ public class ClientHandler {
         try {
             while (true) {
                 final String message = in.readUTF();
-                if (getCommandByText(message) == END) {
-                    break;
+                if (Command.isCommand(message)) {
+                    if (getCommandByText(message) == END) {
+                        break;
+                    }
+                    if (getCommandByText(message) == PRIVATE_MESSAGE) {
+                        String[] split = message.split(" ");
+                        String nickTo = split[1];
+                        chatServer.sendMessageToClient(this, nickTo, message.substring(PRIVATE_MESSAGE.getCommand().length() + 2 + nickTo.length()));
+                    }
+                    continue;
                 }
-                if (getCommandByText(message) == PRIVATE_MESSAGE) {
-                    String[] split = message.split(" ");
-                    String nickTo = split[1];
-                    String msg = split[2];
-                    chatServer.sendMessageToClient(this, nickTo, msg);
-                }
-                    chatServer.broadcast(message);
+                    chatServer.broadcast(nick + ": " + message);
                 }
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,7 +131,7 @@ public class ClientHandler {
 
     public void sendMessage(String message) {
         try {
-                out.writeUTF (LocalTime.now().withSecond(0).withNano(0) + " || " + nick + ": " + message);
+                out.writeUTF (LocalTime.now().withSecond(0).withNano(0) + " || " + ": " + message);
         } catch (IOException e) {
             e.printStackTrace();
         }

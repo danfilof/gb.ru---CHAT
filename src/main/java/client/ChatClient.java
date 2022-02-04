@@ -1,6 +1,7 @@
 package client;
 
 import server.ClientController;
+import server.Command;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,6 +9,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+
+import static server.Command.*;
 
 public class ChatClient {
     private Socket socket;
@@ -29,7 +32,7 @@ public class ChatClient {
                 try {
                     while (true) {
                         final String authMsg = in.readUTF();
-                        if (authMsg.startsWith("/authok")) {
+                        if (getCommandByText(authMsg) == AUTHOK) {
                             final String nick = authMsg.split(" ")[1];
                             controller.addMessage("Successful authorisation. Nick: " + nick);
                             controller.setAuth(true);
@@ -38,13 +41,16 @@ public class ChatClient {
                     }
                     while (true) {
                         final String message = in.readUTF();
-                        if ("/end".equals(message)) {
-                            controller.setAuth(false);
-                            break;
-                        }
-                        if (message.startsWith("/clients")) {
-                            String[] clients = message.replace("/clients", "").split(" ");
-                            controller.updateClientsList(clients);
+                        if (Command.isCommand(message)) {
+                            final Command command = getCommandByText(message);
+                            if (command == END) {
+                                controller.setAuth(false);
+                                break;
+                            }
+                            if (getCommandByText(message) == CLIENTS) {
+                                String[] clients = message.replace(CLIENTS.getCommand() + " ", "").split(" ");
+                                controller.updateClientsList(clients);
+                            }
                         }
                         controller.addMessage(message);
                     }
