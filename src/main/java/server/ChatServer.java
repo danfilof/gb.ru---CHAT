@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ChatServer {
 
@@ -40,30 +41,34 @@ public class ChatServer {
 
     }
 
-    public void subscribe(ClientHandler client) {
+    public void subscribe (ClientHandler client) {
         clients.put(client.getNick(), client);
     }
 
-    public void unsubscribe(ClientHandler client) {
+    public void unsubscribe (ClientHandler client) {
         clients.remove(client.getNick(), client);
     }
 
-    public void broadcast(String message) {
+    public void broadcast (String message) {
         for (ClientHandler client : clients.values()) {
             client.sendMessage(message);
         }
     }
-    // Отправка приватных сообщений пользователю
-    public void privateSend(ClientHandler FROM, String message) {
-        final String TO = message.split(" ")[1];
-        for (ClientHandler client : clients.values()) {
-            if (client.getNick().equals(TO)) {
-                // Выводим приватное сообщение и стираем у него первые 7 символов, дабы избежать повторения
-                client.sendMessage("/w from " + FROM.getNick() + ": " + message.substring(7));
-                break;
-            }
+
+    public void sendMessageToClient(ClientHandler from, String nickTo, String message ) {
+        final ClientHandler clientTo = clients.get(nickTo);
+        if (clientTo != null) {
+            clientTo.sendMessage("From " + from.getNick() + ": " + message);
+            from.sendMessage("The user " + nickTo + ": " + message);
+            return;
         }
-        // Написать пользователю, что он отправил приватное сообщение
-        FROM.sendMessage("/w to " + TO + ": " + message.substring(7));
+        from.sendMessage("There is no user in the chat with nick " + nickTo);
     }
+
+public void broadcastClientList() {
+        final String message = clients.values().stream()
+                .map(ClientHandler::getNick)
+                .collect(Collectors.joining(" "));
+        broadcast(message);
+}
 }

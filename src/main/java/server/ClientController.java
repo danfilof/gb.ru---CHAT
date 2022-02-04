@@ -7,6 +7,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ClientController {
 
     @FXML
@@ -18,7 +21,7 @@ public class ClientController {
     @FXML
     private HBox messageBox;
     @FXML
-    private ListView clientList;
+    private ListView<String> clientList;
 
 
     @FXML
@@ -52,11 +55,22 @@ public class ClientController {
     }
 
     public void selectClient(MouseEvent mouseEvent) {
-
+        if (mouseEvent.getClickCount() == 2) {
+           final String message = messageField.getText();
+            final String client = clientList.getSelectionModel().getSelectedItem();
+            messageField.setText("/w" + client + " " + message);
+            messageField.requestFocus();
+            messageField.selectEnd();
+        }
     }
 
     public void setAuth(boolean isAuthSuccess) {
         loginBox.setVisible(!isAuthSuccess);
         messageBox.setVisible(isAuthSuccess);
+    }
+
+    public void updateClientsList(String[] clients) {
+        clientList.getItems().clear();
+        clientList.getItems().addAll(clients);
     }
 }

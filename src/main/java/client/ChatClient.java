@@ -6,6 +6,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
 
 public class ChatClient {
     private Socket socket;
@@ -39,6 +41,10 @@ public class ChatClient {
                         if ("/end".equals(message)) {
                             controller.setAuth(false);
                             break;
+                        }
+                        if (message.startsWith("/clients")) {
+                            String[] clients = message.replace("/clients", "").split(" ");
+                            controller.updateClientsList(clients);
                         }
                         controller.addMessage(message);
                     }

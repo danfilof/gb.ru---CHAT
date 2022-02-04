@@ -7,7 +7,13 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import static server.Command.*;
+
 public class ClientHandler {
+
+    private final static String COMMAND_PREFIX = "/";
+
+
     private final Socket socket;
     private final ChatServer chatServer;
     private final DataInputStream in;
@@ -67,15 +73,17 @@ public class ClientHandler {
         try {
             while (true) {
                 final String message = in.readUTF();
-                if ("/end".equals(message)) {
+                if (getCommandByText(message) == END) {
                     break;
-                } else if (message.startsWith("/w")) {
-                    final String privateMSG = message;
-                    chatServer.privateSend(this, privateMSG);
-                } else {
+                }
+                if (getCommandByText(message) == PRIVATE_MESSAGE) {
+                    String[] split = message.split(" ");
+                    String nickTo = split[1];
+                    String msg = split[2];
+                    chatServer.sendMessageToClient(this, nickTo, msg);
+                }
                     chatServer.broadcast(message);
                 }
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,7 +93,7 @@ public class ClientHandler {
         while (true) {
             try {
                 final String message = in.readUTF(); // auth login pass
-                if (message.startsWith("/auth")) {
+                if (getCommandByText(message) == AUTH) {
                     // MAKE CHECK METHOD TO CONFIRM BOTH LOGIN AND PASSWORD HAVE BEEN RECEIVED, OTHERWISE ARRAYINDEXOUTOFBOUNDARYEXCEPTION
                     final String[] split = message.split(" ");
                     final String login = split[1];
@@ -96,7 +104,7 @@ public class ClientHandler {
                             sendMessage("The user is already logged in");
                             continue;
                         }
-                        sendMessage("/authok " + nick);
+                        sendMessage(Command.AUTHOK, nick);
                         this.nick = nick;
                         chatServer.broadcast("The user " + nick + " has entered thr chat");
                         chatServer.subscribe(this);
@@ -111,13 +119,17 @@ public class ClientHandler {
         }
     }
 
+    public void sendMessage(Command command ,String message) {
+        try {
+            out.writeUTF(command.getCommand() + " " + message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendMessage(String message) {
         try {
-            if (message.startsWith("/")) {
-                out.writeUTF(message);
-            } else {
                 out.writeUTF (LocalTime.now().withSecond(0).withNano(0) + " || " + nick + ": " + message);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
