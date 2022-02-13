@@ -27,7 +27,8 @@ public class DBAuthService implements AuthService {
         DBAuthService dbAuthService = new DBAuthService();
         try {
             dbAuthService.connect();
-            // Заполнил таблицу users login и pass, по аналогии с UserData из InMemoryAuthService
+            dbAuthService.batchInsert();
+            // Заполнил таблицу users login, pass и nick по аналогии с UserData из InMemoryAuthService
            // dbAuthService.batchInsert();
         } finally {
             dbAuthService.disconnect();
@@ -36,10 +37,11 @@ public class DBAuthService implements AuthService {
     }
 
     private void batchInsert() {
-        try (PreparedStatement ps = connection.prepareStatement("insert into users (login, pass) values (?, ?)")) {
+        try (PreparedStatement ps = connection.prepareStatement("insert into users (login, pass, nick) values (?, ?, ?)")) {
             for (int i = 0; i < 10; i++) {
                 ps.setString(1, "login" + i);
                 ps.setString(2,"pass" + i);
+                ps.setString(3, "nick" + i);
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -48,8 +50,8 @@ public class DBAuthService implements AuthService {
         }
     }
 
-    private void insert(String login, String pass) {
-        try(PreparedStatement ps = connection.prepareStatement("insert into users (login, pass) values (?, ?)")) {
+    private void insert(String login, String pass, String nick) {
+        try(PreparedStatement ps = connection.prepareStatement("insert into users (login, pass) values (?, ?, ?)")) {
             ps.setString(1, login);
             ps.setString(2, pass);
             ps.executeUpdate();
