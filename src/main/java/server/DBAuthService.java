@@ -19,7 +19,7 @@ public class DBAuthService implements AuthService {
 
     public void connect() {
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:java_users.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:gb_chat_db.db");
             statement = connection.createStatement();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -30,6 +30,7 @@ public class DBAuthService implements AuthService {
         DBAuthService dbAuthService = new DBAuthService();
         try {
             dbAuthService.connect();
+            dbAuthService.createTable();
             dbAuthService.insert("login0", "pass0");
         } finally {
             dbAuthService.disconnect();
@@ -37,9 +38,17 @@ public class DBAuthService implements AuthService {
 
     }
 
+    private void createTable() {
+        try {
+            statement.executeUpdate("create table if not exists users (" + "id integer primary key autoincrement, " + "login text, " + "pass text" + ")");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void insert(String login, String pass) {
         try {
-            statement.executeUpdate("insert into Users (login, pass) values ('" + login + "', '" + pass + "' + ");
+           statement.executeUpdate("insert into Users (login, pass) values ('" + login + "', '" + pass + "')");
         } catch (SQLException e) {
             e.printStackTrace();
         }
