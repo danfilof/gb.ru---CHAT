@@ -12,51 +12,53 @@ public class DBAuthService implements AuthService {
     public static void main(String[] args) {
         DBAuthService dbAuthService = new DBAuthService();
         try {
-            dbAuthService.connect();
-            dbAuthService.readTable();
+            //dbAuthService.connect();
+           // dbAuthService.readTable();
+            //dbAuthService.getNickByLoginAndPassword("login1", "pass1");
             // Заполнил таблицу users login, pass и nick по аналогии с UserData из InMemoryAuthService
             // dbAuthService.batchInsert();
         } finally {
-            dbAuthService.disconnect();
+           // dbAuthService.disconnect();
         }
 
     }
 
     @Override
     public String getNickByLoginAndPassword(String login, String password) {
-        String nick = "";
+        connect();
+        String nick = checkAuth(login, password);
+        System.out.println(nick);
+        return nick;
+    }
 
-        try (PreparedStatement lg = connection.prepareStatement("select id from users where login = ?")) {
-            lg.setString(1,login);
-            ResultSet rs0 = lg.executeQuery();
-
-            try (PreparedStatement pass = connection.prepareStatement("select id from users where pass = ?")) {
-                pass.setString(1, password);
-                ResultSet rs1 = pass.executeQuery();
-
-                if (rs1.getString("id").equals(rs0.getString("id"))) {
-                    System.out.println("Correct login and password");
-
-                    try (PreparedStatement user_nick = connection.prepareStatement("select nick where id = rs1")) {
-                        ResultSet rn = user_nick.executeQuery();
-                        nick = rn.getString("nick");
-                    }
-                    return nick;
-                } else {
-                    System.out.println("Wrong login or password");
-                }
-            }
+    public String checkAuth(String log, String pass)  {
+        // NullPointerException!!! as connection = 0;
+        try (PreparedStatement ps = connection.prepareStatement("select nick from users where login = ? and pass = ?")){
+            ps.setString(1, log);
+            ps.setString(2, pass);
+            ResultSet rs = ps.executeQuery();
+            String user_nick = rs.getString("nick");
+            return user_nick;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    // Возможнось изменить ник
-    public void updateNick(String newNick,int id)  {
+    // Возможнось изменить ник по id
+    public void updateNickByID(String newNick,int id)  {
         try (PreparedStatement un = connection.prepareStatement("update users set nick = ? where id = ?")) {
             un.setString(1,newNick);
             un.setInt(2, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    // Возможнось изменить ник по login
+    public void updateNickByLogin(String newNick, String login)  {
+        try (PreparedStatement un = connection.prepareStatement("update users set nick = ? where login = ?")) {
+            un.setString(1,newNick);
+            un.setString(2, login);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -115,29 +117,6 @@ public class DBAuthService implements AuthService {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
-    }
-    private static class UserData {
-        private final String login;
-        private final String password;
-        private final String nick;
-
-        public UserData(String login, String password, String nick) {
-            this.login = login;
-            this.password = password;
-            this.nick = nick;
-        }
-
-        public String getLogin() {
-            return login;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public String getNick() {
-            return nick;
         }
     }
 }
