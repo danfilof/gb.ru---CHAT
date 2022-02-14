@@ -94,8 +94,6 @@ public class ClientHandler {
     private void authenticate() {
 
         while (true) {
-            // Вводим простую переменную для проверки идентификации
-            int clientIsAuth = 0;
             try {
                 final String message = in.readUTF(); // auth login pass
                 if (getCommandByText(message) == AUTH) {
@@ -113,7 +111,6 @@ public class ClientHandler {
                         chatServer.broadcast("The user " + nick + " has entered the chat");
                         chatServer.subscribe(this);
                         // Клиент подключился и авторизовался. Значение переменной меняется
-                        clientIsAuth = 1;
                         break;
                     } else {
                         sendMessage("Wrong login and password");
@@ -122,23 +119,6 @@ public class ClientHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            // Проверка на авторизованность
-            int finalClientIsAuth = clientIsAuth;
-            // Запускаю цикл для проверки авторизации. И отпраляю его спать на 2 минуты
-            new Thread(() -> {
-                while (true) {
-                    try {
-                        wait(120000);
-                        // Если знамение переменной не изменилось, значит, авторизация не произошла. Следовательно спустя 120 секунд нужно закрыть сокет.
-                        if (finalClientIsAuth == 0) {
-                            socket.close();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
         }
     }
     public void sendMessage(Command command ,String message) {

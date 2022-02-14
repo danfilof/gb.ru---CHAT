@@ -13,8 +13,8 @@ public class ChatServer {
     private final AuthService authService;
 
     public ChatServer() {
-        clients = new HashMap<>();
-        authService = new InMemoryAuthService();
+        this.clients = new HashMap<>();
+        this.authService = new DBAuthService();
     }
 
     public void start() {
@@ -24,7 +24,6 @@ public class ChatServer {
                 final Socket socket = serverSocket.accept();
                 new ClientHandler(socket, this);
                 System.out.printf("The client %s has connected.", socket.getInetAddress().getHostName());
-                System.out.println("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
