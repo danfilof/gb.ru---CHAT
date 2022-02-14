@@ -12,23 +12,21 @@ public class DBAuthService implements AuthService {
     public static void main(String[] args) {
         DBAuthService dbAuthService = new DBAuthService();
         try {
-            //dbAuthService.connect();
-           // dbAuthService.readTable();
-            //dbAuthService.getNickByLoginAndPassword("login1", "pass1");
-            // Заполнил таблицу users login, pass и nick по аналогии с UserData из InMemoryAuthService
-            // dbAuthService.batchInsert();
+
         } finally {
-           // dbAuthService.disconnect();
+            dbAuthService.disconnect();
         }
 
     }
 
+    // 1. Добавить в сетевой чат авторизацию через базу данных SQLite.
     @Override
     public String getNickByLoginAndPassword(String login, String password) {
         connect();
         String nick = checkAuth(login, password);
         System.out.println(nick);
         return nick;
+
     }
 
     public String checkAuth(String log, String pass)  {
@@ -45,7 +43,7 @@ public class DBAuthService implements AuthService {
         return null;
     }
 
-    // Возможнось изменить ник по id
+    // 2.*Добавить в сетевой чат возможность смены ника.
     public void updateNickByID(String newNick,int id)  {
         try (PreparedStatement un = connection.prepareStatement("update users set nick = ? where id = ?")) {
             un.setString(1,newNick);
