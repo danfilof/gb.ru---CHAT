@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +24,6 @@ public class ClientController {
     private HBox messageBox;
     @FXML
     private ListView<String> clientList;
-
 
     @FXML
     private TextArea messageArea;
@@ -72,5 +73,42 @@ public class ClientController {
     public void updateClientsList(String[] clients) {
         clientList.getItems().clear();
         clientList.getItems().addAll(clients);
+    }
+
+    public void saveChatHistory() {
+        File chatHistory = new File ("chatHistory.txt");
+        if (!chatHistory.exists()) {
+            try {
+                chatHistory.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(chatHistory))) {
+            bos.write(Integer.parseInt(messageArea.getText()));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadChatHistory() {
+        File chatHistory = new File("chatHistory.txt");
+        List<String> historyChat = new ArrayList<>();
+        int msgToRead = 100;
+
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(chatHistory))) {
+            String singleMessage  = String.valueOf(bis.read());
+            while (singleMessage != null && historyChat.size() <= msgToRead) {
+                historyChat.add(singleMessage);
+
+                messageArea.appendText(String.valueOf(historyChat));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

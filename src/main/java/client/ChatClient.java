@@ -1,5 +1,6 @@
 package client;
 
+import server.ChatServer;
 import server.ClientController;
 import server.Command;
 
