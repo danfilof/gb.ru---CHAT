@@ -4,24 +4,24 @@ public class TaskOne {
 
     private final Object mon = new Object();
     private volatile char currentLetter = 'A';
+    private volatile char nextLetter;
+    private volatile char upComingLetter;
 
     public static void main(String[] args) throws InterruptedException {
+
         TaskOne waitNotifyObj = new TaskOne();
         Thread thread1 = new Thread(() -> {
             waitNotifyObj.printA();
         });
         Thread thread2 = new Thread(() -> {
             waitNotifyObj.printB();
-        });Thread thread3 = new Thread(() -> {
+        });
+        Thread thread3 = new Thread(() -> {
             waitNotifyObj.printC();
         });
         thread1.start();
         thread2.start();
         thread3.start();
-
-        //waitNotifyObj.printLetter();
-
-
     }
 
     public void printA() {
@@ -76,45 +76,19 @@ public class TaskOne {
     }
 
 //    public  void printLetter() {
-//
-//        Thread threadA = new Thread(() -> {
-//            System.out.println("A");
-//            currentLetter = 'B';
-//            mon.notifyAll();
-//        });
-//        Thread threadB = new Thread(() -> {
-//            System.out.println("B");
-//            currentLetter = 'C';
-//            mon.notifyAll();
-//        });Thread threadC = new Thread(() -> {
-//            System.out.println("C");
-//            currentLetter = 'A';
-//            mon.notifyAll();
-//        });
-//
-//        synchronized (mon) {
-//            try {
-//                for (int i = 0; i < 5; i++) {
-//                    while (currentLetter != 'A') {
-//                        threadA.wait();
+//        for (int i = 0; i < 5; i++) {
+//            synchronized (mon) {
+//                try {
+//                    while (currentLetter != upComingLetter) {
+//                        mon.wait();
+//                        System.out.println(firstLetter);
+//                        upComingLetter = nextLetter;
+//                        mon.notifyAll();
 //                    }
-//                    threadA.start();
-//
-//                    while (currentLetter != 'B') {
-//                        threadB.wait();
-//                    }
-//                    threadB.start();
-//
-//                    while (currentLetter != 'C') {
-//                        threadC.start();
-//                    }
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
 //                }
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
 //            }
-//
 //        }
-//
 //    }
-
 }
