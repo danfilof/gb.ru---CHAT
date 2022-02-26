@@ -20,6 +20,7 @@ public class ChatServer {
         this.authService = new DBAuthService();
     }
 
+    // Предполагаю, что обработка потоков должна проходить здесь
     public void start() {
         executorService = Executors.newCachedThreadPool();
         try(ServerSocket serverSocket = new ServerSocket(8189)) {
