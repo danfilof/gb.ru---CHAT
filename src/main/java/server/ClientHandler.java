@@ -17,7 +17,7 @@ public class ClientHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
 
-
+    private HistoryLogger historyLogger;
     private String nick;
 
     public ClientHandler(Socket socket, ChatServer chatServer) {
@@ -31,6 +31,7 @@ public class ClientHandler {
             new Thread(() -> {
                 try {
                     authenticate();
+                    loadHistory();
                     readMessage();
                 } finally {
                     closeConnection();
@@ -39,6 +40,14 @@ public class ClientHandler {
             }).start();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+    private void loadHistory() {
+        final String message = historyLogger.loadHistory();
+        try {
+            out.writeUTF(message);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -63,6 +72,9 @@ public class ClientHandler {
                 chatServer.unsubscribe(this);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            if (historyLogger != null) {
+                historyLogger.close();
             }
         }
     }
@@ -108,6 +120,7 @@ public class ClientHandler {
                         this.nick = nick;
                         chatServer.broadcast("The user " + nick + " has entered the chat");
                         chatServer.subscribe(this);
+                        this.historyLogger = new HistoryLogger(nick);
                         // Клиент подключился и авторизовался. Значение переменной меняется
                         break;
                     } else {
@@ -130,6 +143,7 @@ public class ClientHandler {
     public void sendMessage(String message) {
         try {
                 out.writeUTF (LocalTime.now().withSecond(0).withNano(0) + " || " + ": " + message);
+                historyLogger.log(message);
         } catch (IOException e) {
             e.printStackTrace();
         }
