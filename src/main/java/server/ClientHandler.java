@@ -102,7 +102,6 @@ public class ClientHandler {
     }
 
     private void authenticate() {
-
         while (true) {
             try {
                 final String message = in.readUTF(); // auth login pass

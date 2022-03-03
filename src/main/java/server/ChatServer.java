@@ -9,8 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class ChatServer {
-
-
     private final Map<String, ClientHandler> clients;
     private final AuthService authService;
     private ExecutorService executorService;
@@ -22,19 +20,19 @@ public class ChatServer {
 
     // Предполагаю, что обработка потоков должна проходить здесь
     public void start() {
-        executorService = Executors.newCachedThreadPool();
+        //executorService = Executors.newCachedThreadPool();
         try(ServerSocket serverSocket = new ServerSocket(8189)) {
             while (true)  {
                 System.out.println("Waiting for connection...");
                 final Socket socket = serverSocket.accept();
-//                new ClientHandler(socket, this);
+               new ClientHandler(socket, this);
                 System.out.printf("The client %s has connected.", socket.getInetAddress().getHostName());
-                executorService.execute((Runnable) new ClientHandler(socket, this));
+                //executorService.execute(new ClientHandler(socket, this));
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            executorService.shutdownNow();
+           // executorService.shutdownNow();
         }
     }
 
