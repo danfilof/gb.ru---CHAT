@@ -142,7 +142,9 @@ public class ClientHandler {
     public void sendMessage(String message) {
         try {
                 out.writeUTF (LocalTime.now().withSecond(0).withNano(0) + " || " + ": " + message);
-                historyLogger.log(message);
+                if (historyLogger != null && !Command.isCommand(message)) {
+                    historyLogger.log(message);
+                }
         } catch (IOException e) {
             e.printStackTrace();
         }

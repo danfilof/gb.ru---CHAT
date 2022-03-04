@@ -5,19 +5,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class HistoryLogger {
-
     private static final int MAX_LINE_COUNT = 100;
 
     private final Writer writer;
     private final File file;
 
     public HistoryLogger(String nick) {
-        this.file = new File("history_" + nick + " .txt");
+        this.file = new File("history_" + nick + ".txt");
         try {
             if (!file.exists()) {
                 final boolean isCreate = file.createNewFile();
                 if (!isCreate) {
-                    throw new RuntimeException();
+                    try {
+                        throw new HistoryFileException("Cannot create new file");
+                    } catch (HistoryFileException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             this.writer = new BufferedWriter(new FileWriter(file, true));
@@ -37,18 +40,26 @@ public class HistoryLogger {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException();
+            try {
+                throw new HistoryFileException(e);
+            } catch (HistoryFileException ex) {
+                ex.printStackTrace();
+            }
         }
         return String.join("\n", messages);
     }
 
     public void log(String message) {
         try {
-            if (message.isEmpty()) {
+            if (!message.isEmpty()) {
                 writer.write(message + "\n");
             }
         } catch (IOException e) {
-            throw new RuntimeException();
+            try {
+                throw new HistoryFileException(e);
+            } catch (HistoryFileException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -56,7 +67,11 @@ public class HistoryLogger {
         try {
             writer.close();
         } catch (IOException e) {
-            throw new RuntimeException();
+            try {
+                throw new HistoryFileException(e);
+            } catch (HistoryFileException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

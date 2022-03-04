@@ -2,3 +2,8 @@ nick1: hahaha?
 nick1: hohoh
 To nick1: ee
 nick2: rrr
+nick1: ttt?
+nick2: gggg?
+To nick1: hhh
+The user nick3 has entered the chat
+nick3: hohoho?
