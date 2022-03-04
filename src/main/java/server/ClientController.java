@@ -74,47 +74,4 @@ public class ClientController {
         clientList.getItems().clear();
         clientList.getItems().addAll(clients);
     }
-
-    // Сохранение чата в формате .txt
-//    public void saveChatHistory() {
-//        // Проверка на существование файла, куда записывается чат
-//        File chatHistory = new File ("chatHistory.txt");
-//        if (!chatHistory.exists()) {
-//            try {
-//                chatHistory.createNewFile();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        // Решил попробовать Buffer, так как на лекции он был заметно производительнее
-//        try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(chatHistory))) {
-//            // Сообщения берутся прямо из TextArea
-//            bos.write(Integer.parseInt(messageArea.getText()));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    // Выгрузка чата из текстового файла
-//    public void loadChatHistory() {
-//        // Записываю все в List, так как хочу, чтобы при подключении все сообщения из прошлого сразу печатались
-//        File chatHistory = new File("chatHistory.txt");
-//        List<String> historyChat = new ArrayList<>();
-//        int msgToRead = 100;
-//
-//        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(chatHistory))) {
-//            String singleMessage  = String.valueOf(bis.read());
-//            // Записываю весь текст в List<String> и потов печатаю его в TextArea
-//            while (singleMessage != null && historyChat.size() <= msgToRead) {
-//                historyChat.add(singleMessage);
-//            }
-//            messageArea.appendText(String.valueOf(historyChat));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }
